@@ -57,10 +57,9 @@ The following endpoints are currently available:
 
 | Method   | Endpoint            | Description              |
 | -------- | ------------------- | ------------------------ |
-| `GET`    | `/api/v1/user`      | Get all registered users |
-| `POST`   | `/api/v1/user`      | Register a new user      |
-| `DELETE` | `/api/v1/user/{id}` | Delete a user by ID      |
-| `PUT`    | `/api/v1/user/{id}` | Update a user's details  |
+| `GET`    | `/api/v1/demo-controller`      | Secured call, returns text |
+| `POST`   | `/api/v1/auth/register`      | Register a new user      |
+| `POST` | `/api/v1/auth/authenticate` | Authenticate user      |
 
 ### 6. Postman Collection
 
