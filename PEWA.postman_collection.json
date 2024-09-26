@@ -9,32 +9,42 @@
 	},
 	"item": [
 		{
-			"name": "Get all users",
+			"name": "Secured demo controller",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lQGdtYWlsLmNvbSIsImlhdCI6MTcyNzM1ODkxNywiZXhwIjoxNzI3MzYwMzU3fQ.K8B6KnC-LlyXp8f4cVfYJAddL1gZTFOkGFhkDFIIAlM",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/api/v1/user",
+					"raw": "{{base_url}}/api/v1/demo-controller",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
 						"v1",
-						"user"
+						"demo-controller"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Add new user",
+			"name": "Register",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"johndoe@gmail.com\",\n    \"password\": \"password\",\n    \"location\": \"Amsterdam\",\n    \"profilePicture\": \"https://avatars.githubusercontent.com/u/77468756?v=4\"\n}",
+					"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"johndoe@gmail.com\",\n    \"password\": \"password\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -42,47 +52,28 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/api/v1/user",
+					"raw": "{{base_url}}/api/v1/auth/register",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
 						"v1",
-						"user"
+						"auth",
+						"register"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Delete user",
+			"name": "Login",
 			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{base_url}}/api/v1/user/1",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"user",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update user",
-			"request": {
-				"method": "PUT",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"updated@gmail.com\"\n}",
+					"raw": "{\n    \"email\": \"johndoe@gmail.com\",\n    \"password\": \"password\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -90,15 +81,15 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/api/v1/user/1",
+					"raw": "{{base_url}}/api/v1/auth/authenticate",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
 						"v1",
-						"user",
-						"1"
+						"auth",
+						"authenticate"
 					]
 				}
 			},
