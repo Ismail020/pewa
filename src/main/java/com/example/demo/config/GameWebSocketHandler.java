@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.models.Game;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHandler;
@@ -12,16 +13,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameWebSocketHandler extends TextWebSocketHandler {
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
-
+    private final GameMatchmaker matchmaker = new GameMatchmaker();
     /**
-     * Functionality for after a connection has been established. Sends welcoming message to client's newly connected session.
+     * Functionality for after a connection has been established. Welcomes player to the queue.
      * @param session websocket session the client is connected to
      * @throws Exception catches all exceptions and throws them.
      */
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception { //throw exception is part of the signature of this, handletextmessage() and afterconnectionclosed(). catches all exceptions thrown.
-        sessions.put(session.getId(), session);
-        session.sendMessage(new TextMessage("Welcome to the zeeslag game WebSocket server!")); // sent to client's session
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        System.out.println("New connection established: " + session.getId());
+        matchmaker.addPlayerToQueue(session);  // Add player to matchmaking queue
     }
 
     /**
