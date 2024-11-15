@@ -8,7 +8,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ChatWebSocketHandler extends TextWebSocketHandler {
+public class GeneralChatWebSocketHandler extends TextWebSocketHandler {
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>(); //not a normal hashmap for thread safety, in websockets every websession's requests/message handling is on a different thread.
 
 
@@ -20,7 +20,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception { //throw exception is part of the signature of this, handletextmessage() and afterconnectionclosed(). catches all exceptions thrown.
         sessions.put(session.getId(), session);
-        session.sendMessage(new TextMessage("Welcome to the zeeslag chat WebSocket server!")); // sent to client's session
+        session.sendMessage(new TextMessage("Welcome to the zeeslag general-chat WebSocket server!")); // sent to client's session
     }
 
     /**

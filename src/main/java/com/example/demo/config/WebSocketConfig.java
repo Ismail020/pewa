@@ -15,6 +15,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new GameWebSocketHandler(), "/ws/game").setAllowedOrigins("*"); // origins (connections) allowed from anywhere for now
-        registry.addHandler(new ChatWebSocketHandler(), "/ws/chat").setAllowedOrigins("*"); // origins (connections) allowed from anywhere for now
+        registry.addHandler(new IngameChatWebSocketHandler(), "/ws/ingame_chat").setAllowedOrigins("*"); // origins (connections) allowed from anywhere for now
+        registry.addHandler(new GeneralChatWebSocketHandler(), "/ws/general_chat").setAllowedOrigins("*"); // origins (connections) allowed from anywhere for now
     }
 }
