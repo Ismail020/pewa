@@ -5,9 +5,12 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
+import java.util.logging.Logger;
+
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
+    
     /**
      * Essentially just the routing for the different handlers.
      * @param registry registry that helps you map websocket handlers to urls.

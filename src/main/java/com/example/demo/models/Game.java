@@ -5,7 +5,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 
 public class Game {
-    private int Id;
+    private int Id; // gonna make it be checked in the by the database.
     private WebSocketSession player1;
     private WebSocketSession player2; // what if it's a bot? implement later.
     private GameState gameState;

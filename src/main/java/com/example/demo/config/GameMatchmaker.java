@@ -14,6 +14,11 @@ public class GameMatchmaker {
     private final Queue<WebSocketSession> waitingPlayers = new LinkedList<>();
     private final Map<Integer, Game> activeGames = new HashMap<>();
 
+    /**
+     * Adds player's session(connected to their client on the web) to the queue of people waiting to find another player.
+     * @param session
+     * @throws Exception
+     */
     public void addPlayerToQueue(WebSocketSession session) throws Exception{
         waitingPlayers.add(session);
         session.sendMessage(new TextMessage("Looking for game..."));
