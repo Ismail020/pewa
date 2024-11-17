@@ -1,9 +1,7 @@
 package com.example.demo.config;
 
-import com.example.demo.models.Game;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -21,8 +19,23 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        String username = (String) session.getAttributes().get("username");
+
+        if (username == null) {
+            session.close(CloseStatus.NOT_ACCEPTABLE);
+            return;
+        }
+
         System.out.println("New connection established: " + session.getId());
         matchmaker.addPlayerToQueue(session);  // Add player to matchmaking queue
+    }
+
+    private String getTokenFromSession(WebSocketSession session) {
+        String query = session.getUri().getQuery();
+        if (query != null && query.contains("token=")) {
+            return query.split("token=")[1];
+        }
+        return null;
     }
 
     /**
@@ -33,11 +46,11 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
      */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        String payload = message.getPayload();
+        System.out.println("Handling websocket message");
         //sends message to all connected clients (except sender)
         for (WebSocketSession s : sessions.values()) {
             if (s.isOpen() && !s.equals(session)) {
-                s.sendMessage(new TextMessage(payload));
+                s.sendMessage(new TextMessage("Message from " + session.getId() + ": " + message.getPayload()));
             }
         }
     }
