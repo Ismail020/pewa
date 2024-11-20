@@ -1,5 +1,6 @@
-package com.example.demo.config;
+package com.example.demo.security;
 
+import com.example.demo.service.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -40,6 +41,7 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
             token = token.substring(7); //Remove 'Bearer' prefix
 
             String username = jwtService.extractUsername(token);
+            System.out.println("Username extracted: " + username);
             if (username != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 if (jwtService.isTokenValid(token, userDetails)) {

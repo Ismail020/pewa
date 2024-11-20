@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demo.models;
 
 public class GameState {
     private boolean isInProgress;

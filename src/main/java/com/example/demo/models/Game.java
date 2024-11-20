@@ -1,6 +1,5 @@
 package com.example.demo.models;
 
-import com.example.demo.config.GameState;
 import org.springframework.web.socket.WebSocketSession;
 
 

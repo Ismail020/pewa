@@ -1,29 +1,50 @@
 package com.example.demo.config;
 
+import com.example.demo.security.WebSocketAuthInterceptor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
+
+import java.security.Principal;
+import java.util.Map;
 
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final WebSocketAuthInterceptor webSocketAuthInterceptor;
     public WebSocketConfig(WebSocketAuthInterceptor webSocketAuthInterceptor) {
         this.webSocketAuthInterceptor = webSocketAuthInterceptor;
     }
 
-    /**
-     * Essentially just the routing for the different handlers.
-     * @param registry registry that helps you map websocket handlers to urls.
-     */
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new GameWebSocketHandler(), "/ws/game")
+   @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/queue");
+        config.setApplicationDestinationPrefixes("/app");
+   }
+
+   @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws/game")
+                .setAllowedOrigins("*")
                 .addInterceptors(webSocketAuthInterceptor)
-                .setAllowedOrigins("*"); // origins (connections) allowed from anywhere for now
-        registry.addHandler(new IngameChatWebSocketHandler(), "/ws/ingame_chat").setAllowedOrigins("*"); // origins (connections) allowed from anywhere for now
-        //optional to introduce new feature?
-        //registry.addHandler(new GeneralChatWebSocketHandler(), "/ws/general_chat").setAllowedOrigins("*"); // origins (connections) allowed from anywhere for now
-    }
+                .setHandshakeHandler(new DefaultHandshakeHandler() {
+                    @Override
+                    protected Principal determineUser(ServerHttpRequest request,
+                                                      WebSocketHandler wsHandler, Map<String, Object> attributes) {
+                        System.out.println("Principal assigned.");
+                        return new Principal() {
+                            @Override
+                            public String getName() {
+                                return (String) attributes.get("username");
+                            }
+                        };
+                    }
+                })
+                .withSockJS();
+   }
 }

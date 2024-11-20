@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demo.controller;
 
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -8,34 +8,19 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class GameWebSocketHandler extends TextWebSocketHandler {
-    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+public class GeneralChatWebSocketHandler extends TextWebSocketHandler {
+    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>(); //not a normal hashmap for thread safety, in websockets every websession's requests/message handling is on a different thread.
 
-    private final GameMatchmaker matchmaker = new GameMatchmaker();
+
     /**
-     * Functionality for after a connection has been established. Welcomes player to the queue.
+     * Functionality for after a connection has been established. Sends welcoming message to client's newly connected session.
      * @param session websocket session the client is connected to
      * @throws Exception catches all exceptions and throws them.
      */
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String username = (String) session.getAttributes().get("username");
-
-        if (username == null) {
-            session.close(CloseStatus.NOT_ACCEPTABLE);
-            return;
-        }
-
-        System.out.println("New connection established: " + session.getId());
-        matchmaker.addPlayerToQueue(session);  // Add player to matchmaking queue
-    }
-
-    private String getTokenFromSession(WebSocketSession session) {
-        String query = session.getUri().getQuery();
-        if (query != null && query.contains("token=")) {
-            return query.split("token=")[1];
-        }
-        return null;
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception { //throw exception is part of the signature of this, handletextmessage() and afterconnectionclosed(). catches all exceptions thrown.
+        sessions.put(session.getId(), session);
+        session.sendMessage(new TextMessage("Welcome to the zeeslag general-chat WebSocket server!")); // sent to client's session
     }
 
     /**
@@ -46,11 +31,11 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
      */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.println("Handling websocket message");
-        //sends message to all connected clients (except sender)
+        String payload = message.getPayload();
+        //sends message to all connected clients (including self)
         for (WebSocketSession s : sessions.values()) {
-            if (s.isOpen() && !s.equals(session)) {
-                s.sendMessage(new TextMessage("Message from " + session.getId() + ": " + message.getPayload()));
+            if (s.isOpen()) {
+                s.sendMessage(new TextMessage(payload));
             }
         }
     }
