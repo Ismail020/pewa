@@ -5,6 +5,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,8 +35,9 @@ public class GeneralChatWebSocketHandler extends TextWebSocketHandler {
         String payload = message.getPayload();
         //sends message to all connected clients (including self)
         for (WebSocketSession s : sessions.values()) {
-            if (s.isOpen()) {
-                s.sendMessage(new TextMessage(payload));
+            try {s.sendMessage(new TextMessage(payload));
+            } catch(IOException e) {
+                sessions.remove(s);
             }
         }
     }
