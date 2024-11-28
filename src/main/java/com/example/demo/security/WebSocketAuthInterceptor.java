@@ -30,7 +30,11 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Map<String, Object> attributes
     ) {
+
+        System.out.println("We are now in the websocketauthintercepter");
+
         String token = request.getHeaders().getFirst("Authorization");
+        System.out.println("We are now in the websocketauthintercepter token: " + token);
 
         if (token == null || token.isEmpty()) {
             response.setStatusCode(HttpStatus.FORBIDDEN);
