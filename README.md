@@ -55,11 +55,13 @@ Once the application is running, you can access the API at http://localhost:8080
 
 The following endpoints are currently available:
 
-| Method   | Endpoint            | Description              |
-| -------- | ------------------- | ------------------------ |
-| `GET`    | `/api/v1/demo-controller`      | Secured call, returns text |
-| `POST`   | `/api/v1/auth/register`      | Register a new user      |
-| `POST` | `/api/v1/auth/authenticate` | Authenticate user      |
+| Method | Endpoint                    | Description                          |
+|--------|-----------------------------|--------------------------------------|
+| `GET`  | `/api/v1/demo-controller`   | Secured call, returns text           |
+| `POST` | `/api/v1/auth/register`     | Register a new user                  |
+| `POST` | `/api/v1/auth/authenticate` | Authenticate user                    |
+| `POST` | `/api/v1/health`            | Get health status of the application |
+| `POST` | `/api/v1/match/create`      | Creates a match in database          |
 
 ### 6. Postman Collection
 
