@@ -25,7 +25,10 @@ public class GameController {
         matchmaker.addPlayerToQueue(principal.getName());
         System.out.println("User added to queue: " + principal.getName());
 
-        return "Welcome to waiting queue, " + principal.getName();
+        String responseJson = String.format("{\"message\":\"Welcome to waiting queue, %s\"}", principal.getName());
+
+
+        return responseJson;
     }
 
 }
