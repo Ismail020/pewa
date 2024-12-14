@@ -1,5 +1,8 @@
 package com.example.demo.models;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class GameState {
     private boolean isInProgress;
     private boolean isFinished;

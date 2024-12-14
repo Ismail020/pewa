@@ -34,11 +34,11 @@ public class WebsocketChannelInterceptor implements ChannelInterceptor {
 
 
             if (token == null || !token.startsWith("Bearer ")) {
-                System.out.println("Missing or invalid token");
+                //System.out.println("Missing or invalid token");
                 throw new IllegalArgumentException("Invalid or missing Authorization header");
             }
             token = token.substring(7);
-            System.out.println("Trimmed token is " + token);
+            //System.out.println("Trimmed token is " + token);
 
             try {
                 String username = jwtService.extractUsername(token);
@@ -51,14 +51,12 @@ public class WebsocketChannelInterceptor implements ChannelInterceptor {
                 }
 
                 accessor.setUser(() -> username);
-                ;
                 System.out.println("User successfully authenticated: " + username);
+                //gameMatchmaker.addPlayerToQueue(username);
             } catch (Exception e) {
                 System.out.println("Token validation failed: " + e.getMessage());
                 throw new IllegalArgumentException("Invalid token");
             }
-
-
         }
         return message;
     }
