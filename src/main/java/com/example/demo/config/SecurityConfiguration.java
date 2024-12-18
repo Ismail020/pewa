@@ -1,9 +1,10 @@
 package com.example.demo.config;
 
-import jakarta.servlet.Filter;
+import com.example.demo.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,8 +34,9 @@ public class SecurityConfiguration {
                 .configurationSource(corsConfigurationSource())
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**")
-                .permitAll()
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/ws/**").permitAll() // Permit WebSocket endpoints
+                .requestMatchers(HttpMethod.OPTIONS).permitAll() // Allow OPTIONS requests (preflight)
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -50,14 +52,17 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5173"));
+        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5173", "http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/v1/auth/**", configuration);
+        source.registerCorsConfiguration("/ws/**", configuration);
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 }

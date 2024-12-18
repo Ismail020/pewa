@@ -83,3 +83,18 @@ The project includes unit tests for various components. To run the tests, use th
 ```bash
 mvn test
 ```
+### 7. Websocket Endpoints and Channels
+
+The following endpoints are set up for websockets:
+
+| Type (Frame) | Endpoint           | Description                                    | Message format | Method      |
+|--------------|--------------------|------------------------------------------------|----------------|-------------|
+| `CONNECT`    | `/ws/game`         | Establishes WS connection                      | N/A            | activate()  |
+| `SUBSCRIBE`  | `/user/queue/game` | Subscribes to game upgames for a specific user | JSON           | subscribe() |
+| `SUBSCRIBE`  | `/topic`           | Subscribes to global updates                   | JSON           | subscribe() |
+| `SEND`       | `/app/start`       | Starts matchmaking process                     | JSON           | publish()   |
+| `SEND`       | `/app`             | Accepts messages from client                   | JSON           | publish()   |
+
+`/topic`
+and 
+`/app` can be further extended and specified for particular users, for example `/app/chat/<gameId>` and `/topic/chat/<gameId>`
