@@ -14,7 +14,7 @@ public class Game {
 
     @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id; // gonna make it be checked in the by the database.
+    private Long Id; // gonna make it be checked in the by the database.
     public void setId(int id) {};
 
     @Setter
@@ -31,7 +31,12 @@ public class Game {
     public Game(String player1, String player2) {
         this.player1 = player1;
         this.player2 = player2;
+        this.gameState = new GameState(player1, player2);
+
     }
 
-    //later functionality for
+    public Long getId() {
+        return Id;
+    }
+//later functionality for
 }

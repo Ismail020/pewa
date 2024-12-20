@@ -14,11 +14,13 @@ public class GameMatchmaker {
     private final Queue<String> waitingPlayers = new LinkedList<>();
     private final GameRepository gameRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final GameService gameService; // inject GameService
 
 
-    public GameMatchmaker(GameRepository gameRepository, SimpMessagingTemplate messagingTemplate) {
+    public GameMatchmaker(GameRepository gameRepository, SimpMessagingTemplate messagingTemplate, GameService gameService) {
         this.gameRepository = gameRepository;
         this.messagingTemplate = messagingTemplate;
+        this.gameService = gameService; // initialize gameService
     }
 
     public void addPlayerToQueue(String username) {
@@ -26,6 +28,14 @@ public class GameMatchmaker {
         if (waitingPlayers.size() >= 2) {
             startGame();
         }
+    }
+
+    public void removePlayerFromQueue(String username) {
+        waitingPlayers.remove(username);
+    }
+
+    public boolean isPlayerInQueue(String username) {
+        return waitingPlayers.contains(username);
     }
 
     private void startGame() {
@@ -37,11 +47,12 @@ public class GameMatchmaker {
             return;
         }
 
-        GameState gameState = new GameState();
-        gameState.setInProgress(true);
-
+        //start game by initializing the gamestate and registering it with the gameservice.
         Game game = new Game(player1, player2);
-        game.setGameState(gameState);
+        gameService.initializeGame(game);
+        game.setGameState(new GameState(player1, player2));
+        game.getGameState().setInProgress(true);
+
 
         Game savedGame = gameRepository.save(game);
 
