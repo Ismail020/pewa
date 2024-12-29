@@ -55,8 +55,6 @@ public class GameMatchmaker {
         messagingTemplate.convertAndSendToUser(savedGame.getPlayer2(), "/queue/game", game);
 
         System.out.println("Notified players of game start.");
-
-
     }
 }
 
