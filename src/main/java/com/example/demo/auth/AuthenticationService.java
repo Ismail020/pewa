@@ -13,47 +13,46 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    private final UserRepository repository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
+        private final UserRepository repository;
+        private final PasswordEncoder passwordEncoder;
+        private final JwtService jwtService;
+        private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
-        var userCheck = repository.findUserByEmail(request.getEmail());
+        public AuthenticationResponse register(RegisterRequest request) {
+                var userCheck = repository.findUserByEmail(request.getEmail());
 
-        if (userCheck.isPresent()) {
-            throw new IllegalStateException("Email is already taken");
+                if (userCheck.isPresent()) {
+                        throw new IllegalStateException("Email is already taken");
+                }
+
+                var user = User.builder()
+                                .name(request.getName())
+                                .email(request.getEmail())
+                                .location(request.getLocation())
+                                .password(passwordEncoder.encode(request.getPassword()))
+                                .role(Role.USER)
+                                .profilePicture(request.getAvatar())
+                                .build();
+
+                repository.save(user);
+                var jwtToken = jwtService.generateToken(user);
+                return AuthenticationResponse.builder()
+                                .token(jwtToken)
+                                .build();
         }
 
-        var user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .profilePicture(request.getAvatar())
-                .build();
+        public AuthenticationResponse authenticate(AuthenticationRequest request) {
+                authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(
+                                                request.getEmail(),
+                                                request.getPassword()));
 
-        repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
-    }
+                var user = repository.findUserByEmail(request.getEmail())
+                                .orElseThrow();
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
-
-        var user = repository.findUserByEmail(request.getEmail())
-                .orElseThrow();
-
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
-    }
+                var jwtToken = jwtService.generateToken(user);
+                return AuthenticationResponse.builder()
+                                .token(jwtToken)
+                                .build();
+        }
 }
