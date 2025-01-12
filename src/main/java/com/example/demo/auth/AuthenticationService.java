@@ -55,4 +55,13 @@ public class AuthenticationService {
                                 .token(jwtToken)
                                 .build();
         }
+
+        public boolean checkIfEmailExists(String email) {
+                return repository.findUserByEmail(email).isPresent();
+        }
+
+        public void sendResetLink(String email) {
+//                UserDetails userDetails =
+//                String token = jwtService.generateToken(userDetails)
+        }
 }

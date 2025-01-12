@@ -25,7 +25,19 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
     ) {
-        System.out.println("");
         return ResponseEntity.ok(service.authenticate(request));
+    }
+
+    @PostMapping("/password-reset")
+    public ResponseEntity<String> sendPasswordResetLink(@RequestBody PasswordResetRequest request) {
+        String email = request.getEmail();
+        System.out.println(email);
+        boolean userExists = service.checkIfEmailExists(email);
+        if (userExists) {
+            service.sendResetLink(email);
+            return ResponseEntity.ok("Password reset link sent to you email.");
+        } else {
+            return ResponseEntity.status(404).body("No registered user is associated with this email");
+        }
     }
 }
