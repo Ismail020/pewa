@@ -30,6 +30,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
+                .profilePicture(request.getAvatar())
                 .build();
 
         repository.save(user);
