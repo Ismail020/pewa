@@ -6,10 +6,8 @@ import jakarta.persistence.Embeddable;
 public class GameState {
     private boolean isInProgress;
     private boolean isFinished;
-
     private String currentTurnHolder;
     private String gameWinner;
-
 
     public GameState() {
         this.isInProgress = false;
@@ -17,6 +15,8 @@ public class GameState {
         this.currentTurnHolder = "player1";
         this.gameWinner = null;
     }
+
+
 
     public boolean isInProgress() {
         return isInProgress;
