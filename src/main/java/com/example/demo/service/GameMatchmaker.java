@@ -3,10 +3,13 @@ package com.example.demo.service;
 import com.example.demo.models.Game;
 import com.example.demo.models.GameRepository;
 import com.example.demo.models.GameState;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.io.Console;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +51,19 @@ public class GameMatchmaker {
             System.out.println(username + " removed from queue" );
 
             notifyQueueChange();
+        }
+    }
+
+    // Event listener for when a WebSocket session is disconnected
+    @EventListener
+    public void handleSessionDisconnect(SessionDisconnectEvent event) {
+        Principal principal = event.getUser(); // Get the Principal object
+        if (principal != null) {
+            String username = principal.getName(); // Safely get the username from Principal
+            System.out.println("User disconnected: " + username);
+            removePlayerFromQueue(username);
+        } else {
+            System.out.println("User disconnected but Principal is null.");
         }
     }
 
