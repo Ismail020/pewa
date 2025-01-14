@@ -1,32 +1,23 @@
 package com.example.demo.friend;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import com.example.demo.user.User;
 import com.example.demo.user.UserRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class FriendService {
-    private final UserRepository userRepository;
+    @Autowired
+    private FriendRepository friendRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public FriendService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public User addFriend(Integer userId, Integer friendId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        User friend = userRepository.findById(friendId)
-                .orElseThrow(() -> new IllegalArgumentException("Friend not found"));
-
-        user.getFriends().add(friend);
-        return userRepository.save(user);
-    }
-
-    public List<User> getFriends(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return user.getFriends();
+    public void addFriend(String username, String friendUsername) {
+        User user = userRepository.findUserByUsername(username).orElseThrow();
+        User friend = userRepository.findUserByUsername(friendUsername).orElseThrow();
+        Friend newFriend = new Friend();
+        newFriend.setUser(user);
+        newFriend.setFriend(friend);
+        friendRepository.save(newFriend);
     }
 }
