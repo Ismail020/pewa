@@ -5,6 +5,8 @@ import com.example.demo.user.Role;
 import com.example.demo.user.User;
 import com.example.demo.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +19,7 @@ public class AuthenticationService {
         private final PasswordEncoder passwordEncoder;
         private final JwtService jwtService;
         private final AuthenticationManager authenticationManager;
+        private final JavaMailSender mailSender;
 
         public AuthenticationResponse register(RegisterRequest request) {
                 var userCheck = repository.findUserByEmail(request.getEmail());
@@ -61,7 +64,12 @@ public class AuthenticationService {
         }
 
         public void sendResetLink(String email) {
-//                UserDetails userDetails =
-//                String token = jwtService.generateToken(userDetails)
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setFrom("projects.smtp@gmail.com");
+                message.setTo(email);
+                message.setSubject("Password reset link");
+                message.setText("TODO: reset link here");
+                mailSender.send(message);
+
         }
 }
