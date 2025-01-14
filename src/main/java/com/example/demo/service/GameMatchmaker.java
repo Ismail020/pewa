@@ -37,9 +37,8 @@ public class GameMatchmaker {
         );
 
         // Convert the message map to JSON and send it
-        String responseJson = new ObjectMapper().writeValueAsString(message);
 
-        messagingTemplate.convertAndSend("/topic/info", responseJson);    }
+        messagingTemplate.convertAndSend("/topic/info", message);    }
 
 
     public void addPlayerToQueue(String username) {
