@@ -21,6 +21,7 @@ public class AuthenticationService {
         private final AuthenticationManager authenticationManager;
         private final JavaMailSender mailSender;
 
+
         public AuthenticationResponse register(RegisterRequest request) {
                 var userCheck = repository.findUserByEmail(request.getEmail());
 
@@ -64,11 +65,21 @@ public class AuthenticationService {
         }
 
         public void sendResetLink(String email) {
+                String resetToken = jwtService.generatePasswordResetToken(email);
+
+                String resetLink = "http://localhost:5173/reset-password?token="+resetToken;
+
+//                Optional<User> user = repository.findUserByEmail(email);
+//                Optional<String>username = user.getName(user);
+//
+
                 SimpleMailMessage message = new SimpleMailMessage();
+
                 message.setFrom("projects.smtp@gmail.com");
                 message.setTo(email);
                 message.setSubject("Password reset link");
-                message.setText("TODO: reset link here");
+                message.setText("Dear user, \nClick on the link below to reset your password to Zeeslag. \n\n"
+                        + resetLink + " \n If you did not request password reset, please ignore this message.");
                 mailSender.send(message);
 
         }
