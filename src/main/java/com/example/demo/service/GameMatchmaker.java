@@ -3,6 +3,8 @@ package com.example.demo.service;
 import com.example.demo.models.Game;
 import com.example.demo.models.GameRepository;
 import com.example.demo.models.GameState;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -10,10 +12,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.io.Console;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -27,11 +26,20 @@ public class GameMatchmaker {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void notifyQueueChange() {
-        List<String> playersInQueue = getQueuePlayers();
-        String responseJson = String.format("{\"queueSize\":%d,\"players\":%s}", playersInQueue.size(), playersInQueue);
-        messagingTemplate.convertAndSend("/topic/info", responseJson); // Broadcasting to all clients
-    }
+    public void notifyQueueChange() throws JsonProcessingException {
+
+        List<String> playersInQueue = getQueuePlayers(); // List of players in queue
+
+        // Create a map to represent the structure of the message
+        Map<String, Object> message = Map.of(
+                "queueSize", playersInQueue.size(),
+                "players", playersInQueue
+        );
+
+        // Convert the message map to JSON and send it
+        String responseJson = new ObjectMapper().writeValueAsString(message);
+
+        messagingTemplate.convertAndSend("/topic/info", responseJson);    }
 
 
     public void addPlayerToQueue(String username) {
@@ -40,7 +48,11 @@ public class GameMatchmaker {
                 waitingPlayers.add(username);
                 System.out.println(username + " added to queue" );
 
-                notifyQueueChange();
+                try {
+                    notifyQueueChange();
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
@@ -50,7 +62,11 @@ public class GameMatchmaker {
             waitingPlayers.remove(username);
             System.out.println(username + " removed from queue" );
 
-            notifyQueueChange();
+            try {
+                notifyQueueChange();
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -72,7 +88,11 @@ public class GameMatchmaker {
             if (waitingPlayers.contains(challenger) && waitingPlayers.contains(challenged)) {
                 waitingPlayers.remove(challenger);
                 waitingPlayers.remove(challenged);
-                notifyQueueChange();
+                try {
+                    notifyQueueChange();
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
                 startGame(challenger, challenged);
             } else {
                 messagingTemplate.convertAndSendToUser(challenger, "/queue/error", "Challenge failed. Player no longer in queue.");
