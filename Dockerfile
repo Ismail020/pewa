@@ -1,23 +1,13 @@
-FROM openjdk:17-jdk-alpine
+FROM openjdk:17-jdk
 
 # Stel de werkdirectory in
 WORKDIR /app
 
 # Kopieer de applicatiebestanden
-COPY . .
+COPY target/demo-0.0.1-SNAPSHOT.jar app.jar
 
-# Kopieer de .env-file
-COPY .env .env
-
-# Installeer Maven wrapper
-RUN ./mvnw clean package
-
-# Kopieer de gegenereerde jar naar de app
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
-
-# Zorg ervoor dat Spring Boot de .env kan vinden
-ENV SPRING_CONFIG_LOCATION=classpath:application.properties,./.env
+# Kopieer de .env-file naar de werkdirectory
+COPY .env /app/.env
 
 # Start de applicatie
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
