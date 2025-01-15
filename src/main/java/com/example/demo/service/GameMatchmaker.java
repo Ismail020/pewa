@@ -13,6 +13,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import java.io.Console;
 import java.security.Principal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,10 +21,12 @@ public class GameMatchmaker {
     private final Queue<String> waitingPlayers = new LinkedList<>();
     private final GameRepository gameRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final TimerService timerService;
 
-    public GameMatchmaker(GameRepository gameRepository, SimpMessagingTemplate messagingTemplate) {
+    public GameMatchmaker(GameRepository gameRepository, SimpMessagingTemplate messagingTemplate, TimerService timerService) {
         this.gameRepository = gameRepository;
         this.messagingTemplate = messagingTemplate;
+        this.timerService = timerService;
     }
 
     public void notifyQueueChange() throws JsonProcessingException {
@@ -107,6 +110,8 @@ public class GameMatchmaker {
         game.setGameState(gameState);
 
         Game savedGame = gameRepository.save(game);
+
+        timerService.startTimer(String.valueOf(savedGame.getId()), 30, TimeUnit.SECONDS);
 
         messagingTemplate.convertAndSendToUser(player1, "/queue/game", savedGame);
         messagingTemplate.convertAndSendToUser(player2, "/queue/game", savedGame);
