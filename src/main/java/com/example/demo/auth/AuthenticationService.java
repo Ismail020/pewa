@@ -69,9 +69,6 @@ public class AuthenticationService {
 
                 String resetLink = "http://localhost:5173/reset-password?token="+resetToken;
 
-//                Optional<User> user = repository.findUserByEmail(email);
-//                Optional<String>username = user.getName(user);
-//
 
                 SimpleMailMessage message = new SimpleMailMessage();
 
