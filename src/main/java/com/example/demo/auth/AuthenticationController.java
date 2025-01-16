@@ -72,12 +72,10 @@ public class AuthenticationController {
 
         User user = userRepository.findUserByEmail(email).orElse(null);
 
-
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "User does not exist"));
         }
-
 
         if (!jwtService.isTokenValid(requestToken, user)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -85,10 +83,8 @@ public class AuthenticationController {
         }
         user.setPassword(password);
         userRepository.saveAndFlush(user);
-        System.out.println("The username is decoded: " + email + ". New password is received: " + password);
-
 
         return ResponseEntity
-                .ok(Map.of("message", "New Password and token have been received"));
+                .ok(Map.of("message", "Your password has been successfully reset"));
     }
 }
