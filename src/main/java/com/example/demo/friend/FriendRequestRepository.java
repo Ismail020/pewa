@@ -6,6 +6,11 @@ import java.util.List;
 
 public interface FriendRequestRepository extends JpaRepository<FriendRequest, Integer> {
 
+    /**
+     * Repository for friend requests.
+     *
+     * Author: Danann & Shahin
+     */
     List<FriendRequest> findByReceiver_EmailAndStatus(String receiverEmail, Status status);
 
     List<FriendRequest> findBySender_EmailAndStatus(String senderEmail, Status status);

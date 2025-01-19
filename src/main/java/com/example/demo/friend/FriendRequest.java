@@ -13,6 +13,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "friend_request")
+
+/**
+ * Represents a friend request between two users.
+ *
+ * Author: Danann & Shahin
+ */
 public class FriendRequest {
 
     @Id

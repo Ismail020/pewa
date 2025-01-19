@@ -9,6 +9,11 @@ import java.util.List;
 @RequestMapping("/api/friend-requests")
 public class FriendRequestController {
 
+    /**
+     * Controller to handle friend requests.
+     *
+     * Author: Danann & Shahin
+     */
     @Autowired
     private FriendRequestService friendRequestService;
 

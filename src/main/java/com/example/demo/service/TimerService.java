@@ -15,16 +15,32 @@ public class TimerService {
      * This service is responsible for managing timers for matches.
      * It uses a ScheduledExecutorService to schedule tasks that send countdown messages to the clients.
      * The timers are stored in a ConcurrentHashMap with the match ID as the key.
+     *
+     * Author: Danann Bartels
      */
     private final ConcurrentHashMap<String, Runnable> matchTimers = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final SimpMessagingTemplate messagingTemplate;
 
+    /**
+     * Constructor for the TimerService.
+     * It injects the SimpMessagingTemplate to send messages to the clients.
+     *
+     * @param messagingTemplate The messaging template to send messages to clients
+     */
     @Autowired
     public TimerService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
 
+    /**
+     * Starts a timer for the given match ID with the specified delay.
+     * The timer sends countdown messages to the clients every second until the time is up.
+     *
+     * @param matchId The ID of the match
+     * @param delay   The delay in seconds before the timer expires
+     * @param unit    The time unit for the delay
+     */
     public void startTimer(String matchId, long delay, TimeUnit unit) {
         Runnable task = new Runnable() {
             private long remainingTime = unit.toSeconds(delay);
@@ -47,10 +63,21 @@ public class TimerService {
         scheduler.schedule(task, 1, TimeUnit.SECONDS);
     }
 
+    /**
+     * Cancels the timer for the given match ID.
+     *
+     * @param matchId The ID of the match
+     */
     public void cancelTimer(String matchId) {
         matchTimers.remove(matchId);
     }
 
+    /**
+     * Checks if a timer is running for the given match ID.
+     *
+     * @param matchId The ID of the match
+     * @return true if a timer is running, false otherwise
+     */
     public boolean isTimerRunning(String matchId) {
         return matchTimers.containsKey(matchId);
     }
