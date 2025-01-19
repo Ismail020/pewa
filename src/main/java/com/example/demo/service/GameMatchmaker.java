@@ -69,6 +69,26 @@ public class GameMatchmaker {
         }
     }
 
+
+
+    public void notifyChallenged(String challenger, String challenged) {
+        System.out.println("yo");
+        synchronized (waitingPlayers) {
+            waitingPlayers.stream()
+                    .filter(player -> player.equals(challenged))
+                    .findFirst()
+                    .ifPresent(challengedPlayer -> {
+                        // Access the attributes of the challenged player here
+                        // For example:
+                        Map<String, String> message = new HashMap<>();
+                        message.put("message", challenger);
+                        messagingTemplate.convertAndSendToUser(challenged, "/queue/challenged", message);
+
+                    });
+        }
+    }
+
+
     // Event listener for when a WebSocket session is disconnected
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
@@ -84,22 +104,29 @@ public class GameMatchmaker {
 
     public void handleChallenge(String challenger, String challenged) {
         synchronized (waitingPlayers) {
+            System.out.println("no way, its being handled!");
+
+            System.out.println(waitingPlayers);
+            System.out.println(challenger);
+            System.out.println(challenged);
+
+            challenger = challenger.replace("\"", "");
+            challenged = challenged.replace("\"", "");
+
+
             if (waitingPlayers.contains(challenger) && waitingPlayers.contains(challenged)) {
-                waitingPlayers.remove(challenger);
-                waitingPlayers.remove(challenged);
-                try {
-                    notifyQueueChange();
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-                startGame(challenger, challenged);
+                System.out.println("if check works!");
+                notifyChallenged(challenger , challenged);
             } else {
                 messagingTemplate.convertAndSendToUser(challenger, "/queue/error", "Challenge failed. Player no longer in queue.");
             }
         }
     }
 
-    private void startGame(String player1, String player2) {
+    public void startGame(String player1, String player2) {
+        player2 = player2.replace("\"", "");
+
+        // Create the game state and save it
         GameState gameState = new GameState();
         gameState.setInProgress(true);
 
@@ -108,9 +135,17 @@ public class GameMatchmaker {
 
         Game savedGame = gameRepository.save(game);
 
-        messagingTemplate.convertAndSendToUser(player1, "/queue/game", savedGame);
-        messagingTemplate.convertAndSendToUser(player2, "/queue/game", savedGame);
+        // Remove both players from the waiting list
+        String finalPlayer2 = player2;
+        waitingPlayers.removeIf(player -> player.equals(player1) || player.equals(finalPlayer2));
+
+        // Notify both players with the game ID
+        String gameIdMessage = "{\"gameId\": \"" + savedGame.getId() + "\"}";
+        System.out.println(gameIdMessage + player1 + player2);
+        messagingTemplate.convertAndSendToUser(player1, "/queue/gameId", gameIdMessage);
+        messagingTemplate.convertAndSendToUser(player2, "/queue/gameId", gameIdMessage);
     }
+
 
     public List<String> getQueuePlayers() {
         synchronized (waitingPlayers) {

@@ -19,35 +19,30 @@ public class GameController {
         this.matchmaker = matchmaker;
     }
 
-//    //@SendToUser("/queue/game") sends the response to the user-specific queue /user/{username}/queue/game
-//    @MessageMapping("/start")
-//    @SendToUser("/queue/game")
-//    public String startGame(Principal principal) {
-//
-//        matchmaker.addPlayerToQueue(principal.getName());
-//        System.out.println("User added to queue: " + principal.getName());
-//
-//        String responseJson = String.format("{\"message\":\"Welcome to waiting queue, %s\"}", principal.getName());
-//
-//        return responseJson;
-//    }
+    @MessageMapping("/start")
+    @SendToUser("/user/queue/challenged")
+    public void startGame(Principal principal, @Payload String player2) {
 
 
-@MessageMapping("/ships-placed")
-@SendToUser("/queue/game")
-public String receiveShips(List<Ship> ships, Principal principal) {
-    System.out.println("Received ships from " + principal.getName());
-
-    // Log the ship information
-    for (Ship ship : ships) {
-        System.out.println("Ship Name: " + ship.getName());
-        System.out.println("Ship Size: " + ship.getSize());
-        System.out.println("Ship Locations: " + ship.getLocations());
+        matchmaker.startGame(principal.getName(), player2);
     }
 
-    // You can add additional logic to handle the ship placement, etc.
-    String responseJson = String.format("{\"message\":\"Ships received for %s\"}", principal.getName());
-    return responseJson;
-}
+
+    @MessageMapping("/ships-placed")
+    @SendToUser("/queue/game")
+    public String receiveShips(List<Ship> ships, Principal principal) {
+        System.out.println("Received ships from " + principal.getName());
+
+        // Log the ship information
+        for (Ship ship : ships) {
+            System.out.println("Ship Name: " + ship.getName());
+            System.out.println("Ship Size: " + ship.getSize());
+            System.out.println("Ship Locations: " + ship.getLocations());
+        }
+
+        // You can add additional logic to handle the ship placement, etc.
+        String responseJson = String.format("{\"message\":\"Ships received for %s\"}", principal.getName());
+        return responseJson;
+    }
 }
 
