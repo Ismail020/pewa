@@ -13,7 +13,6 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import java.io.Console;
 import java.security.Principal;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
@@ -21,12 +20,10 @@ public class GameMatchmaker {
     private final Queue<String> waitingPlayers = new LinkedList<>();
     private final GameRepository gameRepository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final TimerService timerService;
 
-    public GameMatchmaker(GameRepository gameRepository, SimpMessagingTemplate messagingTemplate, TimerService timerService) {
+    public GameMatchmaker(GameRepository gameRepository, SimpMessagingTemplate messagingTemplate) {
         this.gameRepository = gameRepository;
         this.messagingTemplate = messagingTemplate;
-        this.timerService = timerService;
     }
 
     public void notifyQueueChange() throws JsonProcessingException {
@@ -72,6 +69,25 @@ public class GameMatchmaker {
         }
     }
 
+
+
+    public void notifyChallenged(String challenger, String challenged) {
+        synchronized (waitingPlayers) {
+            waitingPlayers.stream()
+                    .filter(player -> player.equals(challenged))
+                    .findFirst()
+                    .ifPresent(challengedPlayer -> {
+                        // Access the attributes of the challenged player here
+                        // For example:
+                        Map<String, String> message = new HashMap<>();
+                        message.put("message", challenger + " challenged you!");
+                        messagingTemplate.convertAndSendToUser(challenged, "/queue/challenged", message);
+
+                    });
+        }
+    }
+
+
     // Event listener for when a WebSocket session is disconnected
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
@@ -87,22 +103,28 @@ public class GameMatchmaker {
 
     public void handleChallenge(String challenger, String challenged) {
         synchronized (waitingPlayers) {
+            System.out.println("no way, its being handled!");
+
+
             if (waitingPlayers.contains(challenger) && waitingPlayers.contains(challenged)) {
-                waitingPlayers.remove(challenger);
-                waitingPlayers.remove(challenged);
-                try {
-                    notifyQueueChange();
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-                startGame(challenger, challenged);
+                System.out.println("if check works!");
+////                waitingPlayers.remove(challenger);
+////                waitingPlayers.remove(challenged);
+////                waitingPlayers.remove();
+//                try {
+//                    notifyQueueChange();
+//                } catch (JsonProcessingException e) {
+//                    throw new RuntimeException(e);
+//                }
+                notifyChallenged(challenger , challenged);
+//                startGame(challenger, challenged);
             } else {
                 messagingTemplate.convertAndSendToUser(challenger, "/queue/error", "Challenge failed. Player no longer in queue.");
             }
         }
     }
 
-    private void startGame(String player1, String player2) {
+    public void startGame(String player1, String player2) {
         GameState gameState = new GameState();
         gameState.setInProgress(true);
 
@@ -111,10 +133,8 @@ public class GameMatchmaker {
 
         Game savedGame = gameRepository.save(game);
 
-        timerService.startTimer(String.valueOf(savedGame.getId()), 30, TimeUnit.SECONDS);
-
-        messagingTemplate.convertAndSendToUser(player1, "/queue/game", savedGame);
-        messagingTemplate.convertAndSendToUser(player2, "/queue/game", savedGame);
+        messagingTemplate.convertAndSendToUser(player1, "/queue/challenged", savedGame);
+        messagingTemplate.convertAndSendToUser(player2, "/queue/challenged", savedGame);
     }
 
     public List<String> getQueuePlayers() {

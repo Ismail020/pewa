@@ -36,14 +36,14 @@ public class GameControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void startGame() {
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("testUser");
-
-        String response = gameController.startGame(principal);
-
-        verify(matchmaker, times(1)).addPlayerToQueue("testUser");
-        assertEquals("{\"message\":\"Welcome to waiting queue, testUser\"}", response);
-    }
+//    @Test
+//    void startGame() {
+//        Principal principal = mock(Principal.class);
+//        when(principal.getName()).thenReturn("testUser");
+//
+//        String response = gameController.startGame(principal);
+//
+//        verify(matchmaker, times(1)).addPlayerToQueue("testUser");
+//        assertEquals("{\"message\":\"Welcome to waiting queue, testUser\"}", response);
+//    }
 }

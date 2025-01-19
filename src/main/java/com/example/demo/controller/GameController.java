@@ -19,17 +19,14 @@ public class GameController {
         this.matchmaker = matchmaker;
     }
 
-    //@SendToUser("/queue/game") sends the response to the user-specific queue /user/{username}/queue/game
+    //TODO @SendToUser("/queue/game") sends the response to the user-specific queue /user/{username}/queue/game
     @MessageMapping("/start")
-    @SendToUser("/queue/game")
-    public String startGame(Principal principal) {
+    @SendToUser("/user/queue/challenged")
+    public void startGame(Principal principal, @Payload String string) {
 
-        matchmaker.addPlayerToQueue(principal.getName());
-        System.out.println("User added to queue: " + principal.getName());
+        System.out.println("TODO Game functionality starts here!");
 
-        String responseJson = String.format("{\"message\":\"Welcome to waiting queue, %s\"}", principal.getName());
-
-        return responseJson;
+//        matchmaker.startGame(principal.getName(), string);
     }
 
 
