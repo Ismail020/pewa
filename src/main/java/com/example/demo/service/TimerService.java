@@ -11,9 +11,14 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class TimerService {
+    /**
+     * This service is responsible for managing timers for matches.
+     * It uses a ScheduledExecutorService to schedule tasks that send countdown messages to the clients.
+     * The timers are stored in a ConcurrentHashMap with the match ID as the key.
+     */
     private final ConcurrentHashMap<String, Runnable> matchTimers = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private final SimpMessagingTemplate messagingTemplate; // Spring's WebSocket messaging template
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public TimerService(SimpMessagingTemplate messagingTemplate) {
@@ -32,6 +37,8 @@ public class TimerService {
                     scheduler.schedule(this, 1, TimeUnit.SECONDS);
                 } else {
                     matchTimers.remove(matchId);
+                    // Notify players about match end
+                    messagingTemplate.convertAndSend("/topic/match/" + matchId, "Time's up!");
                 }
             }
         };

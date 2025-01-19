@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.models.Ship;
 import com.example.demo.service.GameMatchmaker;
+import com.example.demo.service.TimerService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.annotation.SendToUser;
@@ -14,9 +15,12 @@ import java.util.List;
 public class GameController {
 
     private final GameMatchmaker matchmaker;
+    private final TimerService timerService;
 
-    public GameController(GameMatchmaker matchmaker) {
+
+    public GameController(GameMatchmaker matchmaker, TimerService timerService) {
         this.matchmaker = matchmaker;
+        this.timerService = timerService;
     }
 
     //TODO @SendToUser("/queue/game") sends the response to the user-specific queue /user/{username}/queue/game
