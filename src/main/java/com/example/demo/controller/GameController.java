@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.models.GameRepository;
 import com.example.demo.models.Ship;
 import com.example.demo.service.GameMatchmaker;
+import com.example.demo.service.GameService;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.annotation.SendToUser;
@@ -30,19 +33,21 @@ public class GameController {
 
     @MessageMapping("/ships-placed")
     @SendToUser("/queue/game")
-    public String receiveShips(List<Ship> ships, Principal principal) {
+    public void receiveShips(List<Ship> ships, Principal principal) {
+
         System.out.println("Received ships from " + principal.getName());
+
+        String playerName = principal.getName().replace("\"", "");
+
+
+        GameService gameService = new GameService();
 
         // Log the ship information
         for (Ship ship : ships) {
-            System.out.println("Ship Name: " + ship.getName());
-            System.out.println("Ship Size: " + ship.getSize());
-            System.out.println("Ship Locations: " + ship.getLocations());
+            gameService.storeShips(ship.getLocations(), playerName);
+            System.out.println(gameService.getPlayerShipLocations());
+
         }
 
-        // You can add additional logic to handle the ship placement, etc.
-        String responseJson = String.format("{\"message\":\"Ships received for %s\"}", principal.getName());
-        return responseJson;
     }
 }
-

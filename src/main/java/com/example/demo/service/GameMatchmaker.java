@@ -128,7 +128,8 @@ public class GameMatchmaker {
 
         // Create the game state and save it
         GameState gameState = new GameState();
-        gameState.setInProgress(true);
+
+
 
         Game game = new Game(player1, player2);
         game.setGameState(gameState);
@@ -145,6 +146,10 @@ public class GameMatchmaker {
         messagingTemplate.convertAndSendToUser(player1, "/queue/gameId", gameIdMessage);
         messagingTemplate.convertAndSendToUser(player2, "/queue/gameId", gameIdMessage);
         System.out.println("queue players still remaining: " + waitingPlayers);
+
+
+
+
     }
 
 
