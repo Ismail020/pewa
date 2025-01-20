@@ -144,6 +144,7 @@ public class GameMatchmaker {
         System.out.println(gameIdMessage + player1 + player2);
         messagingTemplate.convertAndSendToUser(player1, "/queue/gameId", gameIdMessage);
         messagingTemplate.convertAndSendToUser(player2, "/queue/gameId", gameIdMessage);
+        System.out.println("queue players still remaining: " + waitingPlayers);
     }
 
 
