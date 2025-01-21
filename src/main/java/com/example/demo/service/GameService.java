@@ -32,21 +32,20 @@ public class GameService {
         System.out.println("Current locations for " + playerName + ": " + currentShipLocations);
 
         // Ensure GameState is initialized for the game if not already present
+        //FIXME: game id should be a variable
         GameState gameState = gameStates.computeIfAbsent("game1", k -> new GameState());
 
         // Check if both players have placed their ships
-            // Now, both players' ship locations are available, so we can define these variables
-            Set<Integer> player1ShipLocations = playerShipLocations.get("player1");
-            Set<Integer> player2ShipLocations = playerShipLocations.get("player2");
+        // Now, both players' ship locations are available, so we can define these variables
+        Set<Integer> player1ShipLocations = playerShipLocations.get("player1");
+        Set<Integer> player2ShipLocations = playerShipLocations.get("player2");
 
-            // Ensure that player 1 and player 2 have distinct ship locations
+        // Ensure that player 1 and player 2 have distinct ship locations
 
-                startGame(gameState);
+        startGame(gameState);
 
 
     }
-
-
 
 
     private void startGame(GameState gameState) {
