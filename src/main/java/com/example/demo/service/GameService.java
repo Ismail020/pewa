@@ -31,7 +31,7 @@ public class GameService {
             System.out.println("Player 1 is now" + game.getPlayer1() + " Ships are " + game.getPlayer1Locations());
         } else if (playerName.equals(game.getPlayer2())) {
             game.addPlayer2Locations(shipLocations);
-            System.out.println("Player 2 is now " + game.getPlayer2() + " Ships are " + game.getPlayer1Locations());
+            System.out.println("Player 2 is now " + game.getPlayer2() + " Ships are " + game.getPlayer2Locations());
         } else {
             throw new IllegalArgumentException("Player not part of the game");
         }
