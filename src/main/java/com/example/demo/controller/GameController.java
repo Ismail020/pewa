@@ -38,41 +38,23 @@ public class GameController {
     @MessageMapping("/ships-placed")
     @SendToUser("/queue/game")
     public void receiveShips(@Headers Map<String, Object> headers, @Payload List<Ship> ships, Principal principal) {
-
-        //extracting the gameId from the gameId header
         Map<String, List<String>> nativeHeaders = (Map<String, List<String>>) headers.get("nativeHeaders");
-
-        if (nativeHeaders != null && nativeHeaders.containsKey("gameId")) {
-            // Get the gameId list (it should have only one element)
-            List<String> gameIdList = nativeHeaders.get("gameId");
-
-            // Retrieve the first element (the gameId value)
-            if (!gameIdList.isEmpty()) {
-                String gameIdStr = gameIdList.get(0);
-                try {
-                    int gameId = Integer.parseInt(gameIdStr);
-                    System.out.println("Game ID: " + gameId);
-                } catch (NumberFormatException e) {
-                    System.err.println("Invalid gameId format: " + gameIdStr);
-                }
-            } else {
-                System.err.println("gameId list is empty");
-            }
-        } else {
-            System.err.println("gameId header is missing");
+        if (nativeHeaders == null || !nativeHeaders.containsKey("gameId")) {
+            throw new IllegalArgumentException("Missing gameId in headers");
         }
 
+        String gameIdStr = nativeHeaders.get("gameId").get(0);
+        int gameId;
+        try {
+            gameId = Integer.parseInt(gameIdStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid gameId format: " + gameIdStr);
+        }
 
         String playerName = principal.getName().replace("\"", "");
 
-
-//        GameService gameService = new GameService();
-
-        // Log the ship information
         for (Ship ship : ships) {
-            gameService.storeShips(ship.getLocations(), playerName);
-            System.out.println(gameService.getPlayerShipLocations());
-
+            gameService.storeShips(ship.getLocations(), playerName, gameId);
         }
 
     }
