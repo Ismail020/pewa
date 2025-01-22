@@ -63,12 +63,37 @@ public class Game {
     @Transient
     private final Set<Integer> player1Locations = new HashSet<>();
 
-    @Setter
+    @Getter
+    @Transient
+    private final Set<Integer> player1HitsTaken = new HashSet<>();
+
+    @Getter
+    @Transient
+    private final Set<Integer> player1HitsDealt = new HashSet<>();
+
+    @Getter
+    @Transient
+    private final Set<Integer> player1ShotsFired = new HashSet<>();
+
+
     private String player2; // what if it's a bot? implement later.
 
     @Getter
     @Transient
     private final Set<Integer> player2Locations = new HashSet<>();
+
+
+    @Getter
+    @Transient
+    private final Set<Integer> player2HitsTaken = new HashSet<>();
+
+    @Getter
+    @Transient
+    private final Set<Integer> player2HitsDealt = new HashSet<>();
+
+    @Getter
+    @Transient
+    private final Set<Integer> player2ShotsFired = new HashSet<>();
 
     @Setter
     @Embedded

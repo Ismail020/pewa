@@ -141,10 +141,10 @@ public class GameMatchmaker {
         waitingPlayers.removeIf(player -> player.equals(player1) || player.equals(finalPlayer2));
 
         // Notify both players with the game ID
-        String gameIdMessage = "{\"gameId\": \"" + savedGame.getId() + "\"}";
-        System.out.println(gameIdMessage + player1 + player2);
-        messagingTemplate.convertAndSendToUser(player1, "/queue/pregame", gameIdMessage);
-        messagingTemplate.convertAndSendToUser(player2, "/queue/pregame", gameIdMessage);
+        System.out.println(savedGame.getId() + player1 + player2);
+        messagingTemplate.convertAndSendToUser(player1, "/queue/pregame", Map.of("gameId", savedGame.getId(), "player1", player1, "player2", player2));
+        messagingTemplate.convertAndSendToUser(player2, "/queue/pregame", Map.of("gameId", savedGame.getId(), "player1", player1, "player2", player2));
+//        messagingTemplate.convertAndSendToUser(player2, "/queue/pregame", gameIdMessage);
         System.out.println("queue players still remaining: " + waitingPlayers);
 
 
