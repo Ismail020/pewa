@@ -1,8 +1,13 @@
 package com.example.demo.auth;
 
 public class SetNewPasswordRequest {
-    private String password;
-    private String token;
+    private final String password;
+    private final String token;
+
+    public SetNewPasswordRequest(String password, String token) {
+        this.password = password;
+        this.token = token;
+    }
 
     public String getPassword() {
         return password;
