@@ -4,16 +4,13 @@ import com.example.demo.models.Game;
 import com.example.demo.models.GameRepository;
 import com.example.demo.models.GameState;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.io.Console;
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class GameMatchmaker {
@@ -72,6 +69,7 @@ public class GameMatchmaker {
 
 
     public void notifyChallenged(String challenger, String challenged) {
+        System.out.println("yo");
         synchronized (waitingPlayers) {
             waitingPlayers.stream()
                     .filter(player -> player.equals(challenged))
@@ -80,7 +78,7 @@ public class GameMatchmaker {
                         // Access the attributes of the challenged player here
                         // For example:
                         Map<String, String> message = new HashMap<>();
-                        message.put("message", challenger + " challenged you!");
+                        message.put("message", challenger);
                         messagingTemplate.convertAndSendToUser(challenged, "/queue/challenged", message);
 
                     });
@@ -105,19 +103,17 @@ public class GameMatchmaker {
         synchronized (waitingPlayers) {
             System.out.println("no way, its being handled!");
 
+            System.out.println(waitingPlayers);
+            System.out.println(challenger);
+            System.out.println(challenged);
+
+            challenger = challenger.replace("\"", "");
+            challenged = challenged.replace("\"", "");
+
 
             if (waitingPlayers.contains(challenger) && waitingPlayers.contains(challenged)) {
                 System.out.println("if check works!");
-////                waitingPlayers.remove(challenger);
-////                waitingPlayers.remove(challenged);
-////                waitingPlayers.remove();
-//                try {
-//                    notifyQueueChange();
-//                } catch (JsonProcessingException e) {
-//                    throw new RuntimeException(e);
-//                }
                 notifyChallenged(challenger , challenged);
-//                startGame(challenger, challenged);
             } else {
                 messagingTemplate.convertAndSendToUser(challenger, "/queue/error", "Challenge failed. Player no longer in queue.");
             }
@@ -125,16 +121,31 @@ public class GameMatchmaker {
     }
 
     public void startGame(String player1, String player2) {
+        player2 = player2.replace("\"", "");
+
+        // Create the game state and save it
         GameState gameState = new GameState();
-        gameState.setInProgress(true);
+
 
         Game game = new Game(player1, player2);
         game.setGameState(gameState);
 
         Game savedGame = gameRepository.save(game);
 
-        messagingTemplate.convertAndSendToUser(player1, "/queue/challenged", savedGame);
-        messagingTemplate.convertAndSendToUser(player2, "/queue/challenged", savedGame);
+        // Remove both players from the waiting list
+        String finalPlayer2 = player2;
+        waitingPlayers.removeIf(player -> player.equals(player1) || player.equals(finalPlayer2));
+
+        // Notify both players with the game ID
+        String gameIdMessage = "{\"gameId\": \"" + savedGame.getId() + "\"}";
+        System.out.println(gameIdMessage + player1 + player2);
+        messagingTemplate.convertAndSendToUser(player1, "/queue/pregame", gameIdMessage);
+        messagingTemplate.convertAndSendToUser(player2, "/queue/pregame", gameIdMessage);
+        System.out.println("queue players still remaining: " + waitingPlayers);
+
+
+
+
     }
 
     public List<String> getQueuePlayers() {

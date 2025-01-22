@@ -5,6 +5,7 @@ import com.example.demo.user.Role;
 import com.example.demo.user.User;
 import com.example.demo.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,8 @@ public class AuthenticationService {
         private final AuthenticationManager authenticationManager;
         private final JavaMailSender mailSender;
 
+        @Value("${frontend.url}")
+        private String frontendUrl;
 
         public AuthenticationResponse register(RegisterRequest request) {
                 var userCheck = repository.findUserByEmail(request.getEmail());
@@ -67,7 +70,7 @@ public class AuthenticationService {
         public void sendResetLink(String email) {
                 String resetToken = jwtService.generatePasswordResetToken(email);
 
-                String resetLink = "http://localhost:5173/reset-password?token="+resetToken;
+                String resetLink = frontendUrl+"/reset-password?token="+resetToken;
 
 
                 SimpleMailMessage message = new SimpleMailMessage();

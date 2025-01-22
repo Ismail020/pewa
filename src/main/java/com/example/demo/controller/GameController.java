@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.models.Ship;
 import com.example.demo.service.GameMatchmaker;
 import com.example.demo.service.TimerService;
+import com.example.demo.service.GameService;
+import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.annotation.SendToUser;
@@ -10,45 +12,52 @@ import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class GameController {
 
     private final GameMatchmaker matchmaker;
     private final TimerService timerService;
+    private final GameService gameService;
 
-
-    public GameController(GameMatchmaker matchmaker, TimerService timerService) {
+    public GameController(GameMatchmaker matchmaker, TimerService timerService, GameService gameService) {
         this.matchmaker = matchmaker;
         this.timerService = timerService;
+        this.gameService = gameService;
     }
 
-    //TODO @SendToUser("/queue/game") sends the response to the user-specific queue /user/{username}/queue/game
     @MessageMapping("/start")
     @SendToUser("/user/queue/challenged")
-    public void startGame(Principal principal, @Payload String string) {
+    public void startGame(Principal principal, @Payload String player2) {
 
-        System.out.println("TODO Game functionality starts here!");
-
-//        matchmaker.startGame(principal.getName(), string);
+        matchmaker.startGame(principal.getName(), player2);
     }
 
 
-@MessageMapping("/ships-placed")
-@SendToUser("/queue/game")
-public String receiveShips(List<Ship> ships, Principal principal) {
-    System.out.println("Received ships from " + principal.getName());
+    @MessageMapping("/ships-placed")
+    @SendToUser("/queue/game")
+    public void receiveShips(@Headers Map<String, Object> headers, @Payload List<Ship> ships, Principal principal) {
+        Map<String, List<String>> nativeHeaders = (Map<String, List<String>>) headers.get("nativeHeaders");
+        if (nativeHeaders == null || !nativeHeaders.containsKey("gameId")) {
+            throw new IllegalArgumentException("Missing gameId in headers");
+        }
 
-    // Log the ship information
-    for (Ship ship : ships) {
-        System.out.println("Ship Name: " + ship.getName());
-        System.out.println("Ship Size: " + ship.getSize());
-        System.out.println("Ship Locations: " + ship.getLocations());
+        String gameIdStr = nativeHeaders.get("gameId").get(0);
+        int gameId;
+        try {
+            gameId = Integer.parseInt(gameIdStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid gameId format: " + gameIdStr);
+        }
+
+        String playerName = principal.getName().replace("\"", "");
+
+        for (Ship ship : ships) {
+            gameService.storeShips(ship.getLocations(), playerName, gameId);
+        }
+
     }
 
-    // You can add additional logic to handle the ship placement, etc.
-    String responseJson = String.format("{\"message\":\"Ships received for %s\"}", principal.getName());
-    return responseJson;
-}
-}
 
+}
