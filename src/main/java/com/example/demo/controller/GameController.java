@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.models.Ship;
 import com.example.demo.service.GameMatchmaker;
+import com.example.demo.service.TimerService;
 import com.example.demo.service.GameService;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,20 +17,19 @@ import java.util.Map;
 @Controller
 public class GameController {
 
-    //private static final Pattern GAME_ID_PATTERN = Pattern.compile("^\\[([0-9]+)]$");
-
     private final GameMatchmaker matchmaker;
+    private final TimerService timerService;
     private final GameService gameService;
 
-    public GameController(GameMatchmaker matchmaker, GameService gameService) {
+    public GameController(GameMatchmaker matchmaker, TimerService timerService, GameService gameService) {
         this.matchmaker = matchmaker;
+        this.timerService = timerService;
         this.gameService = gameService;
     }
 
     @MessageMapping("/start")
     @SendToUser("/user/queue/challenged")
     public void startGame(Principal principal, @Payload String player2) {
-
 
         matchmaker.startGame(principal.getName(), player2);
     }
@@ -56,7 +56,6 @@ public class GameController {
         for (Ship ship : ships) {
             gameService.storeShips(ship.getLocations(), playerName, gameId);
         }
-
 
     }
 

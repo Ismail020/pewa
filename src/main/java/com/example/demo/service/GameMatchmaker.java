@@ -148,7 +148,6 @@ public class GameMatchmaker {
 
     }
 
-
     public List<String> getQueuePlayers() {
         synchronized (waitingPlayers) {
             return new ArrayList<>(waitingPlayers);
