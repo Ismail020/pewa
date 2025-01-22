@@ -82,7 +82,6 @@ public class Game {
     @Transient
     private final Set<Integer> player2Locations = new HashSet<>();
 
-
     @Getter
     @Transient
     private final Set<Integer> player2HitsTaken = new HashSet<>();

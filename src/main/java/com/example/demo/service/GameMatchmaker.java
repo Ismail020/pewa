@@ -78,8 +78,7 @@ public class GameMatchmaker {
                     .filter(player -> player.equals(challenged))
                     .findFirst()
                     .ifPresent(challengedPlayer -> {
-                        // Access the attributes of the challenged player here
-                        // For example:
+
                         Map<String, String> message = new HashMap<>();
                         message.put("message", challenger);
                         messagingTemplate.convertAndSendToUser(challenged, "/queue/challenged", message);

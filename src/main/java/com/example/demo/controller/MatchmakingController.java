@@ -32,6 +32,7 @@ public class MatchmakingController {
     @MessageMapping("/queue/leave")
     public void leaveQueue(Principal principal) {
         String currentUser = principal.getName();
+        System.out.println(principal.getName() + "is leaving the queue");
         matchmaker.removePlayerFromQueue(currentUser);
     }
 

@@ -43,7 +43,7 @@ public class GameService {
         if (game.getPlayer1Locations().size() == 17 && game.getPlayer2Locations().size() == 17) {
             // Generic turn messages for both players
             String player1Message = String.format("It's your turn, %s! Good luck!", game.getPlayer1());
-            String player2Message = String.format("%s will take the first turn. Please wait for your turn.", game.getPlayer1());
+            String player2Message = String.format("%s will take this turn. Please wait for your turn.", game.getPlayer1());
 
             // Send messages to both players
             sendTurnMessage(game.getPlayer1(), player1Message, gameId);
