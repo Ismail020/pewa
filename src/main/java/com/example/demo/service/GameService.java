@@ -133,7 +133,7 @@ public class GameService {
                     "result", isHit ? "hit" : "miss",
                     "location", location,
                     "message", isHit ? "You hit a target!" : "You missed!",
-                    "player", playerName
+                    "shooter", playerName
             );
 
             Map<String, Object> player2Message = Map.of(
