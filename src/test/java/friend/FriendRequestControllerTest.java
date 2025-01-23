@@ -37,44 +37,44 @@ class FriendRequestControllerTest {
 
     @Test
     void testSendFriendRequest() {
-        // Arrange: Stel dummy e-mailadressen in
+        // Stel dummy e-mailadressen in
         String senderEmail = "sender@example.com";
         String receiverEmail = "receiver@example.com";
 
-        // Act: Roep de methode aan
+        // Roep de methode aan
         friendRequestController.sendFriendRequest(senderEmail, receiverEmail);
 
-        // Assert: Controleer of de service correct is aangeroepen
+        // Controleer of de service correct is aangeroepen
         verify(friendRequestService, times(1)).sendFriendRequest(senderEmail, receiverEmail);
     }
 
     @Test
     void testAcceptFriendRequest() {
-        // Arrange: Stel een mock request ID in
+        // Stel een mock request ID in
         Integer requestId = 1;
 
-        // Act: Roep de methode aan
+        // Roep de methode aan
         friendRequestController.acceptFriendRequest(requestId);
 
-        // Assert: Controleer of de service correct is aangeroepen
+        // Controleer of de service correct is aangeroepen
         verify(friendRequestService, times(1)).acceptFriendRequest(requestId);
     }
 
     @Test
     void testRejectFriendRequest() {
-        // Arrange: Stel een mock request ID in
+        // Stel een mock request ID in
         Integer requestId = 2;
 
-        // Act: Roep de methode aan
+        // Roep de methode aan
         friendRequestController.rejectFriendRequest(requestId);
 
-        // Assert: Controleer of de service correct is aangeroepen
+        // Controleer of de service correct is aangeroepen
         verify(friendRequestService, times(1)).rejectFriendRequest(requestId);
     }
 
     @Test
     void testGetPendingRequests() {
-        // Arrange: Stel een mock user-email en een lijst van friend requests in
+        // Stel een mock user-email en een lijst van friend requests in
         String userEmail = "user@example.com";
         FriendRequest request1 = FriendRequest.builder().id(1).build();
         FriendRequest request2 = FriendRequest.builder().id(2).build();
@@ -83,10 +83,10 @@ class FriendRequestControllerTest {
         // Stel de mock-gedrag in
         when(friendRequestService.getPendingRequestsForUser(userEmail)).thenReturn(mockRequests);
 
-        // Act: Roep de methode aan
+        // Roep de methode aan
         List<FriendRequest> result = friendRequestController.getPendingRequests(userEmail);
 
-        // Assert: Controleer of het resultaat correct is
+        // Controleer of het resultaat correct is
         assertEquals(2, result.size(), "De lijst met verzoeken moet 2 elementen bevatten.");
         assertEquals(mockRequests, result, "De geretourneerde lijst moet overeenkomen met de mock-lijst.");
 

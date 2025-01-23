@@ -16,7 +16,7 @@ class FriendRequestTest {
 
     private User sender; // Verzender van de vriendverzoek
     private User receiver; // Ontvanger van de vriendverzoek
-    private FriendRequest friendRequest; // Het te testen FriendRequest-object
+    private FriendRequest friendRequest; // Het FriendRequest-object
 
     @BeforeEach
     void setUp() {
