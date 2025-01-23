@@ -14,8 +14,10 @@ import com.example.demo.service.GameMatchmaker;
         import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
         import java.security.Principal;
+import java.util.List;
 
-        import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 class MatchmakingControllerTest {
 
@@ -48,22 +50,30 @@ class MatchmakingControllerTest {
         // Arrange
         Principal mockPrincipal = mock(Principal.class);
         when(mockPrincipal.getName()).thenReturn("testUser");
+        List<String> queuePlayers = matchmaker.getQueuePlayers();
+
 
         // Act
         matchmakingController.leaveQueue(mockPrincipal);
 
+
         // Assert
         verify(matchmaker, times(1)).removePlayerFromQueue("testUser");
+        assertTrue(queuePlayers.isEmpty(), "The queue should be empty.");
+
     }
 
     @Test
     void testChallengePlayer() {
         // Arrange
-        Principal mockPrincipal = mock(Principal.class);
-        when(mockPrincipal.getName()).thenReturn("challenger");
+        Principal mockPrincipal1 = mock(Principal.class); // challenger
+        Principal mockPrincipal2 = mock(Principal.class); // challenged
+        when(mockPrincipal1.getName()).thenReturn("challenger");
+        when(mockPrincipal2.getName()).thenReturn("challenged");
+
 
         // Act
-        matchmakingController.challengePlayer("\"challenged\"", mockPrincipal);
+        matchmakingController.challengePlayer(mockPrincipal2.getName(), mockPrincipal1);
 
         // Assert
         verify(matchmaker, times(1)).handleChallenge("challenger", "challenged");
