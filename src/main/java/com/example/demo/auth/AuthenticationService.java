@@ -5,6 +5,9 @@ import com.example.demo.user.Role;
 import com.example.demo.user.User;
 import com.example.demo.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +20,10 @@ public class AuthenticationService {
         private final PasswordEncoder passwordEncoder;
         private final JwtService jwtService;
         private final AuthenticationManager authenticationManager;
+        private final JavaMailSender mailSender;
+
+        @Value("${frontend.url}")
+        private String frontendUrl;
 
         public AuthenticationResponse register(RegisterRequest request) {
                 var userCheck = repository.findUserByEmail(request.getEmail());
@@ -54,5 +61,26 @@ public class AuthenticationService {
                 return AuthenticationResponse.builder()
                                 .token(jwtToken)
                                 .build();
+        }
+
+        public boolean checkIfEmailExists(String email) {
+                return repository.findUserByEmail(email).isPresent();
+        }
+
+        public void sendResetLink(String email) {
+                String resetToken = jwtService.generatePasswordResetToken(email);
+
+                String resetLink = frontendUrl+"/reset-password?token="+resetToken;
+
+
+                SimpleMailMessage message = new SimpleMailMessage();
+
+                message.setFrom("projects.smtp@gmail.com");
+                message.setTo(email);
+                message.setSubject("Password reset link");
+                message.setText("Dear user, \nClick on the link below to reset your password to Zeeslag. \n\n"
+                        + resetLink + " \n If you did not request password reset, please ignore this message.");
+                mailSender.send(message);
+
         }
 }

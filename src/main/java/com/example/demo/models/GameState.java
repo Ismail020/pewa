@@ -1,12 +1,13 @@
 package com.example.demo.models;
 
+import com.example.demo.service.GameService;
 import jakarta.persistence.Embeddable;
+import java.util.List;
 
 @Embeddable
 public class GameState {
     private boolean isInProgress;
     private boolean isFinished;
-
     private String currentTurnHolder;
     private String gameWinner;
 
@@ -18,6 +19,7 @@ public class GameState {
         this.gameWinner = null;
     }
 
+    // Getters and setters for game state
     public boolean isInProgress() {
         return isInProgress;
     }
@@ -42,10 +44,6 @@ public class GameState {
         this.currentTurnHolder = currentTurnHolder;
     }
 
-    public void switchTurn() {
-        this.currentTurnHolder = this.currentTurnHolder.equals("player1") ? "player2" : "player1";
-    }
-
     public String getGameWinner() {
         return gameWinner;
     }
@@ -53,4 +51,8 @@ public class GameState {
     public void setGameWinner(String gameWinner) {
         this.gameWinner = gameWinner;
     }
+
+    public void switchTurn() {
+    }
 }
+

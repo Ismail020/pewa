@@ -52,7 +52,6 @@ public class WebsocketChannelInterceptor implements ChannelInterceptor {
 
                 accessor.setUser(() -> username);
                 System.out.println("User successfully authenticated: " + username);
-                //gameMatchmaker.addPlayerToQueue(username);
             } catch (Exception e) {
                 System.out.println("Token validation failed: " + e.getMessage());
                 throw new IllegalArgumentException("Invalid token");

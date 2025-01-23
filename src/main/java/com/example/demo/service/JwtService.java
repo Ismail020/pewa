@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.user.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -20,11 +19,6 @@ public class JwtService {
 
     private static final String SECRET_KEY = "Dpf6gZ06m6tllemyvb+7puyM3RNpW6wAbDejaXBid6scyQsuL5Se+wxjf74CbFwW";
 
-    private final CustomUserDetailsService userDetailsService;
-
-    public JwtService(CustomUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -47,7 +41,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -77,5 +71,16 @@ public class JwtService {
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String generatePasswordResetToken(String email) {
+        Map<String, Object> claims = new HashMap<>();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 3)) // 3 minutes
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 }
