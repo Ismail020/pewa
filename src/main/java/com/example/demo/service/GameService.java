@@ -20,6 +20,16 @@ public class GameService {
     // Cache for games in memory during their lifecycle
     private final Map<Integer, Game> inMemoryGames = new HashMap<>();
 
+    /**
+     * Stores the ship locations for a specific player in the game.
+     * If both players have set up their ships, it sends turn-based messages to notify them.
+     *
+     * @param shipLocations a list of integers representing the locations of the player's ships
+     * @param playerName    the name of the player who is setting up their ships
+     * @param gameId        the unique identifier of the game
+     * @throws RuntimeException        if the game with the given gameId is not found
+     * @throws IllegalArgumentException if the player is not part of the game
+     */
     public void storeShips(List<Integer> shipLocations, String playerName, int gameId) {
         // Retrieve the game either from cache or database
         Game game = inMemoryGames.computeIfAbsent(gameId, id ->
@@ -38,6 +48,7 @@ public class GameService {
             throw new IllegalArgumentException("Player not part of the game");
         }
 
+        // 17 because that's the expected amount of filled grids per player for a battlefield layout
         if (game.getPlayer1Locations().size() == 17 && game.getPlayer2Locations().size() == 17) {
             // Generic turn messages for both players
             Map<String, Object> player1Message = Map.of(
@@ -56,29 +67,29 @@ public class GameService {
         }
     }
 
-
+    /**
+     * Sends a turn-based message to a specific player in the game.
+     *
+     * @param destination the destination queue or topic to which the message is sent
+     * @param player      the name of the player to whom the message is sent
+     * @param message     a map containing the message data to be sent
+     * @param gameId      the unique identifier of the game
+     */
     private void sendTurnMessage(String destination , String player, Map<String, Object> message, int gameId) {
         simpMessagingTemplate.convertAndSendToUser(player, destination , message);
         System.out.println("Message sent to " + player + ": " + message);
     }
 
-//    public Set<Integer> getPlayerShipLocations(int gameId, String playerName) {
-//        Game game = inMemoryGames.get(gameId);
-//        if (game == null) {
-//            throw new RuntimeException("Game not found with id: " + gameId);
-//        }
-//
-//        if (playerName.equals(game.getPlayer1())) {
-//            System.out.println("Player 1 is now" + game.getPlayer1() + "Ships are " + game.getPlayer1Locations());
-//            return game.getPlayer1Locations();
-//        } else if (playerName.equals(game.getPlayer2())) {
-//            System.out.println("Player 2 is now" + game.getPlayer2() + "Ships are " + game.getPlayer2Locations());
-//            return game.getPlayer2Locations();
-//        } else {
-//            throw new IllegalArgumentException("Player not part of the game");
-//        }
-//    }
 
+    /**
+     * Processes and validates a player's move in the game. Updates the game state based on the move,
+     * sends appropriate notifications to both players, and checks if the game is over.
+     *
+     * @param location   the grid location the player has fired upon
+     * @param playerName the name of the player making the move
+     * @param gameId     the unique identifier of the game
+     * @throws RuntimeException if the game with the specified gameId is not found
+     */
     public void storeValidateMoves(Integer location, String playerName, int gameId  ) {
 
         playerName =  playerName.replace("\"", "");
@@ -177,6 +188,16 @@ public class GameService {
         }
     }
 
+    /**
+     * Checks if the game is over based on the hits taken and the remaining ship locations of a player.
+     * If a player's ships have all been hit, the method determines the winner and sends a game over message.
+     *
+     * @param player      the player whose game state is being checked (either Player 1 or Player 2)
+     * @param locations   the set of all ship locations for the player
+     * @param hitsTaken   the set of locations that have been hit for the player
+     * @param gameId      the unique identifier of the game
+     * @throws RuntimeException if the game with the specified gameId is not found
+     */
     public void checkGameOver(String player, Set<Integer> locations, Set<Integer> hitsTaken, int gameId) {
         Game game = inMemoryGames.computeIfAbsent(gameId, id ->
                 gameRepository.findById(id)

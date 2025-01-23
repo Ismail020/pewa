@@ -18,6 +18,12 @@ public class MatchmakingController {
         this.matchmaker = matchmaker;
     }
 
+    /**
+     * Handles a player's request to join the matchmaking queue.
+     *
+     * @param principal the principal representing the authenticated player
+     * @param message   the payload message sent by the client
+     */
     @MessageMapping("/queue/enter")
     public void joinQueue(@Payload Principal principal, @Payload String message) {
 
@@ -29,6 +35,11 @@ public class MatchmakingController {
         matchmaker.addPlayerToQueue(currentUser);
     }
 
+    /**
+     * Handles a player's request to leave the matchmaking queue.
+     *
+     * @param principal the principal representing the authenticated player
+     */
     @MessageMapping("/queue/leave")
     public void leaveQueue(Principal principal) {
         String currentUser = principal.getName();
@@ -36,6 +47,13 @@ public class MatchmakingController {
         matchmaker.removePlayerFromQueue(currentUser);
     }
 
+    /**
+     * Handles a player's request to challenge another player in the queue.
+     *
+     * @param challenged the username of the player being challenged
+     * @param principal  the principal representing the authenticated challenger
+     * @return null to indicate that the only response is an error if the challenge fails
+     */
     @MessageMapping("/queue/challenge")
     @SendToUser("/queue/error")
     public String challengePlayer(@Payload String challenged, Principal principal) {

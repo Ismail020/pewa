@@ -17,7 +17,6 @@ import java.util.Map;
 @Controller
 public class GameController {
 
-    //private static final Pattern GAME_ID_PATTERN = Pattern.compile("^\\[([0-9]+)]$");
 
     private final GameMatchmaker matchmaker;
     private final GameService gameService;
@@ -27,6 +26,12 @@ public class GameController {
         this.gameService = gameService;
     }
 
+    /**
+     * Starts a new game between two players.
+     *
+     * @param principal the authenticated player initiating the game
+     * @param player2   the username of the second player
+     */
     @MessageMapping("/start")
     @SendToUser("/user/queue/challenged")
     public void startGame(Principal principal, @Payload String player2) {
@@ -36,6 +41,13 @@ public class GameController {
     }
 
 
+    /**
+     * Handles the placement of ships by a player.
+     *
+     * @param headers   the headers containing game-related metadata, including game ID
+     * @param ships     the list of ships placed by the player
+     * @param principal the authenticated player who placed the ships
+     */
     @MessageMapping("/ships-placed")
     @SendToUser("/queue/game")
     public void receiveShips(@Headers Map<String, Object> headers, @Payload List<Ship> ships, Principal principal) {
@@ -59,6 +71,13 @@ public class GameController {
         }
     }
 
+    /**
+     * Processes a player's shot during the game.
+     *
+     * @param headers   the headers containing game-related metadata, including game ID
+     * @param message   the message payload containing the shot location
+     * @param principal the authenticated player who took the shot
+     */
     @MessageMapping("/game/shots")
     public void receiveShots(@Headers Map<String, Object> headers, @Payload Map<String, Object> message, Principal principal) {
         Integer location = (Integer) message.get("location");
@@ -79,7 +98,6 @@ public class GameController {
 
         gameService.storeValidateMoves(location, playerName, gameId );
     }
-//    @SendToUser("/queue/game/")
 
 
 }

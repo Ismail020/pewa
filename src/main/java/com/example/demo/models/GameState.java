@@ -1,8 +1,6 @@
 package com.example.demo.models;
 
-import com.example.demo.service.GameService;
 import jakarta.persistence.Embeddable;
-import java.util.List;
 
 @Embeddable
 public class GameState {
