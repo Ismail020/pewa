@@ -4,16 +4,13 @@ import com.example.demo.models.Game;
 import com.example.demo.models.GameRepository;
 import com.example.demo.models.GameState;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.io.Console;
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class GameMatchmaker {
@@ -166,7 +163,6 @@ public class GameMatchmaker {
 
         // Create the game state and save it
         GameState gameState = new GameState();
-
 
 
         Game game = new Game(player1, player2);

@@ -56,9 +56,13 @@ public class MatchmakingController {
      */
     @MessageMapping("/queue/challenge")
     @SendToUser("/queue/error")
-    public String challengePlayer(@Payload String challenged, Principal principal) {
+    public void challengePlayer(@Payload String challenged, Principal principal) {
+        // Remove double quotes from the start and end of the string
+        challenged = challenged.replaceAll("^\"|\"$", "");
+
+        System.out.println("awesome, " + principal.getName() + " challenged " + challenged);
         String challenger = principal.getName();
         matchmaker.handleChallenge(challenger, challenged);
-        return null; // Only sends error if challenge fails
     }
+
 }
