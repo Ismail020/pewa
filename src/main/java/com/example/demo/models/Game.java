@@ -63,12 +63,36 @@ public class Game {
     @Transient
     private final Set<Integer> player1Locations = new HashSet<>();
 
-    @Setter
-    private String player2; // what if it's a bot? implement later.
+    @Getter
+    @Transient
+    private final Set<Integer> player1HitsTaken = new HashSet<>();
+
+    @Getter
+    @Transient
+    private final Set<Integer> player1HitsDealt = new HashSet<>();
+
+    @Getter
+    @Transient
+    private final Set<Integer> player1ShotsFired = new HashSet<>();
+
+
+    private String player2;
 
     @Getter
     @Transient
     private final Set<Integer> player2Locations = new HashSet<>();
+
+    @Getter
+    @Transient
+    private final Set<Integer> player2HitsTaken = new HashSet<>();
+
+    @Getter
+    @Transient
+    private final Set<Integer> player2HitsDealt = new HashSet<>();
+
+    @Getter
+    @Transient
+    private final Set<Integer> player2ShotsFired = new HashSet<>();
 
     @Setter
     @Embedded
@@ -82,10 +106,20 @@ public class Game {
         this.player2 = player2;
     }
 
+    /**
+     * Adds the specified locations to the set of player 1's locations.
+     *
+     * @param locations a list of integers representing the locations to add for player 1
+     */
     public void addPlayer1Locations(List<Integer> locations) {
         player1Locations.addAll(locations);
     }
 
+    /**
+     * Adds the specified locations to the set of player 2's locations.
+     *
+     * @param locations a list of integers representing the locations to add for player 2
+     */
     public void addPlayer2Locations(List<Integer> locations) {
         player2Locations.addAll(locations);
     }

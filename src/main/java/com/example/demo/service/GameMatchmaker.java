@@ -23,6 +23,11 @@ public class GameMatchmaker {
         this.messagingTemplate = messagingTemplate;
     }
 
+    /**
+     * Notifies all clients about the current state of the queue.
+     *
+     * @throws JsonProcessingException if the message fails to convert to JSON
+     */
     public void notifyQueueChange() throws JsonProcessingException {
 
         List<String> playersInQueue = getQueuePlayers(); // List of players in queue
@@ -38,6 +43,12 @@ public class GameMatchmaker {
         messagingTemplate.convertAndSend("/topic/info", message);    }
 
 
+    /**
+     * Adds a player to the queue if they are not already in it, and notifies the queue change.
+     * Synchronized, to ensure that only one user(so a thread) can modify/access it at the same time
+     *
+     * @param username the username of the player to add
+     */
     public void addPlayerToQueue(String username) {
         synchronized (waitingPlayers) {
             if (!waitingPlayers.contains(username)) {
@@ -53,6 +64,11 @@ public class GameMatchmaker {
         }
     }
 
+    /**
+     * Removes a player from the queue and notifies the queue change.
+     *
+     * @param username the username of the player to remove
+     */
     public void removePlayerFromQueue(String username) {
         synchronized (waitingPlayers) {
             waitingPlayers.remove(username);
@@ -68,6 +84,12 @@ public class GameMatchmaker {
 
 
 
+    /**
+     * Notifies a challenged player that they have been challenged by another player.
+     *
+     * @param challenger the username of the player issuing the challenge
+     * @param challenged the username of the player being challenged
+     */
     public void notifyChallenged(String challenger, String challenged) {
         System.out.println("yo");
         synchronized (waitingPlayers) {
@@ -75,8 +97,7 @@ public class GameMatchmaker {
                     .filter(player -> player.equals(challenged))
                     .findFirst()
                     .ifPresent(challengedPlayer -> {
-                        // Access the attributes of the challenged player here
-                        // For example:
+
                         Map<String, String> message = new HashMap<>();
                         message.put("message", challenger);
                         messagingTemplate.convertAndSendToUser(challenged, "/queue/challenged", message);
@@ -86,7 +107,11 @@ public class GameMatchmaker {
     }
 
 
-    // Event listener for when a WebSocket session is disconnected
+    /**
+     * Handles a WebSocket session disconnect by removing the user from the queue.
+     *
+     * @param event the session disconnect event
+     */
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         Principal principal = event.getUser(); // Get the Principal object
@@ -99,6 +124,12 @@ public class GameMatchmaker {
         }
     }
 
+    /**
+     * Handles a challenge issued by one player to another. If both players are in the queue, it sends a notification.
+     *
+     * @param challenger the username of the player issuing the challenge
+     * @param challenged the username of the player being challenged
+     */
     public void handleChallenge(String challenger, String challenged) {
         synchronized (waitingPlayers) {
             System.out.println("no way, its being handled!");
@@ -120,6 +151,13 @@ public class GameMatchmaker {
         }
     }
 
+    /**
+     * Starts a new game between two players, removes them from the queue, saves the game to the repository,
+     * and notifies both players of the game's creation.
+     *
+     * @param player1 the username of the first player
+     * @param player2 the username of the second player
+     */
     public void startGame(String player1, String player2) {
         player2 = player2.replace("\"", "");
 
@@ -137,10 +175,9 @@ public class GameMatchmaker {
         waitingPlayers.removeIf(player -> player.equals(player1) || player.equals(finalPlayer2));
 
         // Notify both players with the game ID
-        String gameIdMessage = "{\"gameId\": \"" + savedGame.getId() + "\"}";
-        System.out.println(gameIdMessage + player1 + player2);
-        messagingTemplate.convertAndSendToUser(player1, "/queue/pregame", gameIdMessage);
-        messagingTemplate.convertAndSendToUser(player2, "/queue/pregame", gameIdMessage);
+        System.out.println(savedGame.getId() + player1 + player2);
+        messagingTemplate.convertAndSendToUser(player1, "/queue/pregame", Map.of("gameId", savedGame.getId(), "player1", player1, "player2", player2));
+        messagingTemplate.convertAndSendToUser(player2, "/queue/pregame", Map.of("gameId", savedGame.getId(), "player1", player1, "player2", player2));
         System.out.println("queue players still remaining: " + waitingPlayers);
 
 
@@ -148,6 +185,12 @@ public class GameMatchmaker {
 
     }
 
+
+    /**
+     * Retrieves a list of all players currently in the queue.
+     *
+     * @return a list of usernames of players in the queue
+     */
     public List<String> getQueuePlayers() {
         synchronized (waitingPlayers) {
             return new ArrayList<>(waitingPlayers);
