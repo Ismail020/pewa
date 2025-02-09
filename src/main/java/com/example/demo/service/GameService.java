@@ -113,8 +113,7 @@ public class GameService {
 
         if (playerName.equals(game.getPlayer1())) {
             game.getPlayer1ShotsFired().add(location);
-            System.out.println(game.getPlayer2HitsTaken());
-            System.out.println(game.getPlayer2Locations());
+            System.out.println("Shots fired by player1: " + game.getPlayer1ShotsFired());
 
             boolean isHit = game.getPlayer2Locations().contains(location);
             if (isHit) {
@@ -158,6 +157,8 @@ public class GameService {
         }
         if (playerName.equals(game.getPlayer2())) {
             game.getPlayer2ShotsFired().add(location);
+            System.out.println("Shots fired by player2: " + game.getPlayer2ShotsFired());
+
 
             boolean isHit = game.getPlayer1Locations().contains(location);
             if (isHit) {
@@ -227,5 +228,4 @@ public class GameService {
         }
 
     }
-
 }
