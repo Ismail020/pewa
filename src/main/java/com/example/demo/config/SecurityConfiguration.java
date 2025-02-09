@@ -34,7 +34,8 @@ public class SecurityConfiguration {
                 .configurationSource(corsConfigurationSource())
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.OPTIONS).permitAll() // Allow OPTIONS requests (preflight)
+                .requestMatchers(HttpMethod.OPTIONS).permitAll()
+// Allow OPTIONS requests (preflight)
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/ws/**").permitAll() // Permit WebSocket endpoints
                 .anyRequest()
@@ -52,7 +53,11 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://pewa-frontend.onrender.com"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                "https://pewa-frontend.onrender.com",
+                "http://localhost:5173",
+                "http://127.0.0.1:5173"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
