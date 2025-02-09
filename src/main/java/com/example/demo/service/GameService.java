@@ -123,9 +123,10 @@ public class GameService {
                 System.out.println(game.getPlayer2HitsTaken());
 
                 //check, game over
-                this.checkGameOver(game.getPlayer2(), game.getPlayer2Locations(), game.getPlayer2HitsTaken(), gameId);
+                this.checkGameOver(game.getPlayer1(), game.getPlayer2Locations(), game.getPlayer2HitsTaken(), gameId);
             }
 
+            boolean gameOver = game.getGameState().isFinished();
 
 
             // Send concise messages as maps
@@ -133,14 +134,17 @@ public class GameService {
                     "result", isHit ? "hit" : "miss",
                     "location", location,
                     "message", isHit ? "You hit a target!" : "You missed!",
-                    "shooter", playerName
+                    "shooter", playerName,
+                    "gameOver", gameOver
             );
 
             Map<String, Object> player2Message = Map.of(
                     "result", isHit ? "hit" : "miss",
                     "location", location,
                     "message", isHit ? "Your ship was hit!" : "The opponent missed!",
-                    "shooter", playerName
+                    "shooter", playerName,
+                    "gameOver", gameOver
+
 
             );
 
@@ -159,21 +163,29 @@ public class GameService {
             if (isHit) {
                 game.getPlayer1HitsTaken().add(location);
                 game.getPlayer2HitsDealt().add(location);
+
+                this.checkGameOver(game.getPlayer2(), game.getPlayer1Locations(), game.getPlayer1HitsTaken(), gameId);
+
             }
+            boolean gameOver = game.getGameState().isFinished();
+
 
             // Send concise messages as maps
             Map<String, Object> player2Message = Map.of(
                     "result", isHit ? "hit" : "miss",
                     "location", location,
                     "message", isHit ? "You hit a target!" : "You missed!",
-                    "shooter", playerName
+                    "shooter", playerName,
+                    "gameOver", gameOver
+
             );
 
             Map<String, Object> player1Message = Map.of(
                     "result", isHit ? "hit" : "miss",
                     "location", location,
                     "message", isHit ? "Your ship was hit!" : "The opponent missed!",
-                    "shooter", playerName
+                    "shooter", playerName,
+                    "gameOver", gameOver
 
             );
 
@@ -203,14 +215,16 @@ public class GameService {
                 gameRepository.findById(id)
                         .orElseThrow(() -> new RuntimeException("Game not found with id: " + gameId))
         );
+        System.out.println("Checking if the game has ended");
 
-        if (game.getPlayer2().equals(player) && locations.equals(hitsTaken)){
-            sendTurnMessage("/queue/" + gameId, game.getPlayer1(),  Map.of("winner", game.getPlayer1() )  , gameId);
-        }
-        if (Objects.equals(game.getPlayer1(), player) && locations.equals(hitsTaken)){
-            sendTurnMessage("/queue/" + gameId, game.getPlayer2(),  Map.of("winner", game.getPlayer2() ) , gameId);
-        }
+        if (locations.equals(hitsTaken)) {
+            game.getGameState().setFinished(true);
+            game.getGameState().setGameWinner(player);
 
+            sendTurnMessage("/queue/game/gameover", game.getPlayer1(), Map.of("winner", player), gameId);
+            sendTurnMessage("/queue/game/gameover", game.getPlayer2(), Map.of("winner", player), gameId);
+
+        }
 
     }
 
